@@ -1,5 +1,7 @@
 # A scalable file processing system built in Go
 
+## Architecture
+
 API Node:
 - Stateless, horizontally scalable
 - Connects to DB, Task Queue and File Storage using interfaces
@@ -24,3 +26,12 @@ Local Operations:
 - DB: PostgreSQL running on Docker
 - Task Queue: Redis running on Docker
 - File Storage: Shared Docker volume
+
+## Tasks
+
+Learn Go concepts:
+- File I/O
+- Logging middleware
+- Reading and parsing request body
+- Writing JSON data to response
+- Calling external API and parsing its data
