@@ -34,11 +34,6 @@ func HandleGetTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(responseData))
 }
 
-type Task struct {
-	TaskName string `json:"task_name"`
-	TaskValue int `json:"task_value"`
-}
-
 func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
