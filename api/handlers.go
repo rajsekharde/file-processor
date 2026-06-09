@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -41,19 +40,28 @@ type Task struct {
 }
 
 func HandlePostTask(w http.ResponseWriter, r *http.Request) {
-	var task Task
-	json.NewDecoder(r.Body).Decode(&task)
-
-	taskJson, _ := json.Marshal(task)
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Empty or invalid body", http.StatusBadRequest)
+		return
+	}
 
 	url := "http://localhost:8001/task"
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(taskJson))
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(bodyBytes))
 	if err != nil {
+		log.Println(err.Error())
 		http.Error(w, "Failed to send task to worker", http.StatusBadGateway)
+		return
 	}
 	defer resp.Body.Close()
 
-	respData, _ := io.ReadAll(resp.Body)
+	respData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Failed to read request", http.StatusInternalServerError)
+		return
+	}
 	log.Println("Worker:", string(respData))
 
 	w.WriteHeader(http.StatusOK)
