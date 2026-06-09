@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"github.com/rajsekharde/file-processor/shared"
 )
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -19,13 +20,8 @@ func handleTask(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %s %d\n", r.Method, r.URL.Path, http.StatusOK)
 }
 
-type Task struct {
-	TaskName string `json:"task_name"`
-	TaskValue int `json:"task_value"`
-}
-
 func handlePostTask(w http.ResponseWriter, r*http.Request) {
-	var task Task
+	var task shared.Task
 	json.NewDecoder(r.Body).Decode(&task)
 
 	log.Println("Received", task)
