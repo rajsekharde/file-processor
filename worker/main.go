@@ -31,7 +31,7 @@ func handlePostTask(w http.ResponseWriter, r*http.Request) {
 	log.Println("Received", task)
 	log.Printf("%s %s %d\n", r.Method, r.URL.Path, http.StatusOK)
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "Task Processed")
+	fmt.Fprintln(w, "Task Accepted")
 }
 
 func main() {
