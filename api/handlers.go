@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -31,4 +32,19 @@ func HandleGetTask(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, string(responseData))
+}
+
+type Task struct {
+	Name string `json:"task_name"`
+	Value int `json:"task_value"`
+}
+
+func HandlePostTask(w http.ResponseWriter, r *http.Request) {
+	var task Task
+	json.NewDecoder(r.Body).Decode(&task)
+
+	log.Println(task)
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, "Task Accepted")
 }
