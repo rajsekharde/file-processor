@@ -76,13 +76,15 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	dst, err := os.Create("../uploads/" +  handler.Filename)
+	// create new local file at "../file-storage/uploads/" with same name
+	dst, err := os.Create("../file-storage/uploads/" +  handler.Filename)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer dst.Close()
 
+	// copy contents to new file
 	io.Copy(dst, file)
 
 	w.WriteHeader(http.StatusOK)

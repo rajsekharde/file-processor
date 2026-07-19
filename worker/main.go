@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"github.com/rajsekharde/file-processor/shared"
+	// "github.com/rajsekharde/file-processor/shared"
 )
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -20,11 +20,17 @@ func handleTask(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %s %d\n", r.Method, r.URL.Path, http.StatusOK)
 }
 
-func handlePostTask(w http.ResponseWriter, r*http.Request) {
-	var task shared.Task
-	json.NewDecoder(r.Body).Decode(&task)
+type testTask struct {
+	FileName string `json:"file_name"`
+	ConvertTo string `json:"convert_to"`
+}
 
-	log.Println("Received", task)
+func handlePostTask(w http.ResponseWriter, r*http.Request) {
+	// var task shared.Task
+	var t1 testTask
+	json.NewDecoder(r.Body).Decode(&t1)
+
+	log.Println("Received", t1)
 	log.Printf("%s %s %d\n", r.Method, r.URL.Path, http.StatusOK)
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "Task Accepted")
