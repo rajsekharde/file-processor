@@ -14,6 +14,8 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleGetTask(w http.ResponseWriter, r *http.Request) {
+
+	// Get task status from worker via an HTTP request
 	resp, err := http.Get("http://localhost:8001/task")
 
 	if err != nil {
@@ -42,6 +44,7 @@ func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Send task to worker via an HTTP request
 	url := "http://localhost:8001/task"
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(bodyBytes))
 	if err != nil {

@@ -3,7 +3,7 @@
 ## Architecture
 
 API Node:
-- Stateless, horizontally scalable
+- Stateless
 - Connects to DB, Task Queue and File Storage using interfaces
 - Workflow:
     - Accept request from client
@@ -12,7 +12,7 @@ API Node:
     - Push task data to Queue
 
 Worker Node:
-- Stateless, horizontally scalable
+- Stateless
 - Connects to DB, Task Queue and File Storage using interfaces
 - Workflow:
     - Block and listen on Queue
