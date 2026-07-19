@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 )
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
@@ -64,4 +65,26 @@ func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "Task Accepted")
+}
+
+func HandleUpload(w http.ResponseWriter, r *http.Request) {
+	file, handler, err := r.FormFile("newFile")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	dst, err := os.Create("../uploads/" +  handler.Filename)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	io.Copy(dst, file)
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, "File Uploaded")
 }
