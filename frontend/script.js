@@ -13,7 +13,7 @@ async function uploadFile() {
             method: 'POST',
             body: formData
         });
-        if (response.ok) {
+        if (resp.ok) {
             alert("Upload complete");
         } else {
             alert("Upload failed");
@@ -21,4 +21,6 @@ async function uploadFile() {
     } catch (error) {
         console.error("Error uploading file:", error);
     }
+
+    fileInput.value = '';
 }
