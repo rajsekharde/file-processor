@@ -13,6 +13,6 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 		// Pass control to the next handler in the chain
 		next.ServeHTTP(w, r)
 		
-		log.Printf("%s %s %v\n", r.Method, r.URL.Path, time.Since(start))
+		log.Printf("%s %s %v\n\n", r.Method, r.URL.Path, time.Since(start))
 	})
 }

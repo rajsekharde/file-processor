@@ -19,6 +19,6 @@ func main() {
 	mux.Handle("POST /task", LoggerMiddleware(postTask))
 	mux.Handle("POST /upload", LoggerMiddleware(uploadFile))
 
-	log.Println("API Server running on port 8000...")
+	log.Printf("API Server running on port 8000...\n\n")
 	http.ListenAndServe(":8000", mux)
 }

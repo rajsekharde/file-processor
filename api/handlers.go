@@ -63,8 +63,14 @@ func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Worker:", string(respData))
 
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "Task Accepted")
+	// Set header for json payload
+	w.Header().Set("Content-Type", "application/json")
+
+	// Copy status code
+	w.WriteHeader(resp.StatusCode)
+
+	// Copy json response
+	w.Write(respData)
 }
 
 func HandleUpload(w http.ResponseWriter, r *http.Request) {
