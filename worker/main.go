@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/rajsekharde/file-processor/shared"
 	// "github.com/rajsekharde/file-processor/shared"
 )
 
@@ -20,20 +22,14 @@ func handleTask(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %s %d\n", r.Method, r.URL.Path, http.StatusOK)
 }
 
-type testTask struct {
-	FileName string `json:"file_name"`
-	ConvertTo string `json:"convert_to"`
-}
-
 func handlePostTask(w http.ResponseWriter, r*http.Request) {
-	// var task shared.Task
-	var t1 testTask
-	json.NewDecoder(r.Body).Decode(&t1)
+	var task shared.Task
+	json.NewDecoder(r.Body).Decode(&task)
 
-	log.Println("Received", t1)
+	log.Println("Received", task)
 
-	inputPath := "../file-storage/uploads/" + t1.FileName
-	res := ConvertFormat(inputPath, t1.ConvertTo)
+	inputPath := "../file-storage/uploads/" + task.FileName
+	res := ConvertFormat(inputPath, task.OutputFormat)
 	status := http.StatusOK
 	message := "File converted successfully"
 	if(res != 0) {

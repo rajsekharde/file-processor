@@ -1,6 +1,6 @@
 package shared
 
 type Task struct {
-	TaskName string `json:"task_name"`
-	TaskValue int `json:"task_value"`
+	FileName string `json:"file_name"`
+	OutputFormat string `json:"output_format"`
 }
