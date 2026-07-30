@@ -7,19 +7,16 @@ import (
 	"net/http"
 
 	"github.com/rajsekharde/file-processor/shared"
-	// "github.com/rajsekharde/file-processor/shared"
 )
 
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "Worker Server Running")
-	log.Printf("%s %s %d\n", r.Method, r.URL.Path, http.StatusOK)
 }
 
 func handleTask(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "Task Processed")
-	log.Printf("%s %s %d\n", r.Method, r.URL.Path, http.StatusOK)
 }
 
 func handlePostTask(w http.ResponseWriter, r*http.Request) {
@@ -42,15 +39,18 @@ func handlePostTask(w http.ResponseWriter, r*http.Request) {
 
 	w.WriteHeader(status)
 	w.Write([]byte(message))
-	log.Printf("%s %s %d\n\n", r.Method, r.URL.Path, status)
 }
 
 func main() {
 	mux := http.NewServeMux()
+
+	root := http.HandlerFunc(handleRoot)
+	getTask := http.HandlerFunc(handleTask)
+	postTask := http.HandlerFunc(handlePostTask)
 	
-	mux.HandleFunc("GET /", handleRoot)
-	mux.HandleFunc("GET /task", handleTask)
-	mux.HandleFunc("POST /task", handlePostTask)
+	mux.Handle("GET /", shared.LoggerMiddleware(root))
+	mux.Handle("GET /task", shared.LoggerMiddleware(getTask))
+	mux.Handle("POST /task", shared.LoggerMiddleware(postTask))
 
 	log.Printf("Worker Server running on port 8001...\n\n")
 	http.ListenAndServe(":8001", mux)
