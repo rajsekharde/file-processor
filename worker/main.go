@@ -25,20 +25,20 @@ func handlePostTask(w http.ResponseWriter, r*http.Request) {
 
 	log.Println("Received", task)
 
-	inputPath := "../file-storage/uploads/" + task.FileName
-	result, outputPath := ConvertFormat(inputPath, task.OutputFormat)
+	result, message := ConvertFormat(task.FileName, task.OutputFormat)
 	var status int
-	var message string
+	var body string
 	if(result != 0) {
 		status = http.StatusBadRequest
-		message = fmt.Sprintf(`{"status": "failed", "error": %q}`, outputPath)
+		body = fmt.Sprintf(`{"status": "failed", "error": %q}`, message)
 	} else {
 		status = http.StatusOK
-		message = fmt.Sprintf(`{"status": "success", "output_path": %q}`, outputPath)
+		body = fmt.Sprintf(`{"status": "success", "output_file": %q}`, message)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write([]byte(message))
+	w.Write([]byte(body))
 }
 
 func main() {

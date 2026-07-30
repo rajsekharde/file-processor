@@ -11,10 +11,12 @@ import (
 	"time"
 )
 
-func ConvertFormat(inputPath string, outputFormat string) (int, string) {
+func ConvertFormat(inputFileName string, outputFormat string) (int, string) {
 	currentTime := time.Now()
 	dateString := currentTime.Format("2006-01-02")
-	outputPath := "../file-storage/completed/output_" + dateString + "." + outputFormat
+	outputFileName := "output-" + dateString + "." + outputFormat
+	outputPath := "../file-storage/completed/" + outputFileName
+	inputPath := "../file-storage/uploads/" + inputFileName
 
 	inputFile, err := os.Open(inputPath)
 	if err != nil {
@@ -52,5 +54,5 @@ func ConvertFormat(inputPath string, outputFormat string) (int, string) {
 	}
 
 	fmt.Printf("Image successfully converted and saved\n")
-	return 0, outputPath
+	return 0, outputFileName
 }
