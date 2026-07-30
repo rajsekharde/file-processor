@@ -29,16 +29,19 @@ func handlePostTask(w http.ResponseWriter, r*http.Request) {
 	log.Println("Received", task)
 
 	inputPath := "../file-storage/uploads/" + task.FileName
-	res := ConvertFormat(inputPath, task.OutputFormat)
-	status := http.StatusOK
-	message := "File converted successfully"
-	if(res != 0) {
+	result, outputPath := ConvertFormat(inputPath, task.OutputFormat)
+	var status int
+	var message string
+	if(result != 0) {
 		status = http.StatusBadRequest
-		message = "File conversion failed"
+		message = fmt.Sprintf(`{"status": "failed", "error": %q}`, outputPath)
+	} else {
+		status = http.StatusOK
+		message = fmt.Sprintf(`{"status": "success", "output_path": %q}`, outputPath)
 	}
 
 	w.WriteHeader(status)
-	fmt.Fprintln(w, message)
+	w.Write([]byte(message))
 	log.Printf("%s %s %d\n\n", r.Method, r.URL.Path, status)
 }
 
