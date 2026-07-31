@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+var WorkerURL = "http://localhost:8001"
+
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "API Server Running")
@@ -17,7 +19,7 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 func HandleGetTask(w http.ResponseWriter, r *http.Request) {
 
 	// Get task status from worker via an HTTP request
-	resp, err := http.Get("http://localhost:8001/task")
+	resp, err := http.Get(WorkerURL + "/task")
 
 	if err != nil {
 		log.Println(err.Error())
@@ -46,7 +48,7 @@ func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send task to worker via an HTTP request
-	url := "http://localhost:8001/task"
+	url := WorkerURL + "/task"
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(bodyBytes))
 	if err != nil {
 		log.Println(err.Error())

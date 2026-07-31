@@ -1,5 +1,35 @@
 # A scalable file processing system built in Go
 
+# Running the application
+
+Clone the repository
+
+Run the API Server:
+```bash
+cd api
+go run .
+```
+
+Run the worker server:
+```bash
+cd worker
+go run .
+```
+
+Send requests to the api server
+
+Test api server:
+```bash
+cd api
+go test -v
+```
+
+Test worker server:
+```bash
+cd worker
+go test -v
+```
+
 ## Architecture
 
 API Node:
