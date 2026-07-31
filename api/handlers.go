@@ -96,3 +96,25 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "File Uploaded")
 }
+
+func HandleDownload(w http.ResponseWriter, r *http.Request) {
+	fileName := r.PathValue("filename")
+
+	if fileName == "" {
+		http.Error(w, "Missing filename in path", http.StatusBadRequest)
+		return
+	}
+	filePath := "../file-storage/completed/" + fileName
+
+	// Check if file exists and if it's a regular file and not a directory
+	info, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		http.Error(w, "File not found", http.StatusNotFound)
+		return
+	} else if err != nil || info.IsDir() {
+		http.Error(w, "Invalid file request", http.StatusBadRequest)
+		return
+	}
+
+	http.ServeFile(w, r, filePath)
+}
