@@ -14,11 +14,13 @@ func main() {
 	task := http.HandlerFunc(HandleGetTask)
 	postTask := http.HandlerFunc(HandlePostTask)
 	uploadFile := http.HandlerFunc(HandleUpload)
+	downloadFile := http.HandlerFunc(HandleDownload)
 
 	mux.Handle("GET /", shared.LoggerMiddleware(root))
 	mux.Handle("GET /task", shared.LoggerMiddleware(task))
 	mux.Handle("POST /task", shared.LoggerMiddleware(postTask))
 	mux.Handle("POST /upload", shared.LoggerMiddleware(uploadFile))
+	mux.Handle("GET /download/{filename}", shared.LoggerMiddleware(downloadFile))
 
 	log.Printf("API Server running on port 8000...\n\n")
 	http.ListenAndServe(":8000", mux)

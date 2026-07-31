@@ -116,5 +116,8 @@ func HandleDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Force browser to download file to disk instead of opening it in a new tab
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", info.Name()))
+
 	http.ServeFile(w, r, filePath)
 }
