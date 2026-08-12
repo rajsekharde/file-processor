@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-var WorkerURL = "http://localhost:8001"
+var WorkerURL = "http://worker:8001"
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)

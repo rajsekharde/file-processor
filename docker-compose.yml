@@ -4,9 +4,21 @@ services:
     ports:
       - "8000:8000"
     restart: always
+    volumes:
+      - ./file-storage:/file-storage
+    networks:
+      - app-network
   
   worker:
     image: rajsekhar05/file-processor-worker:latest
     ports:
       - "8001:8001"
     restart: always
+    volumes:
+      - ./file-storage:/file-storage
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
