@@ -30,6 +30,30 @@ cd worker
 go test -v
 ```
 
+## Build & Run using Docker & Docker Compose
+
+Move to root project directory
+
+Build the api and worker images:
+```bash
+docker build -f api/Dockerfile -t rajsekhar05/file-processor-api:latest .
+
+docker build -f worker/Dockerfile -t rajsekhar05/file-processor-worker:latest .
+```
+
+Push the images to Docker Hub:
+```bash
+docker push rajsekhar05/file-processor-api:latest
+
+docker push rajsekhar05/file-processor-worker:latest
+```
+
+Run the containers using Docker Compose:
+```bash
+docker compose up
+```
+
+
 ## Architecture
 
 API Node:

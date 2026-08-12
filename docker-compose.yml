@@ -1,0 +1,12 @@
+services:
+  api:
+    image: rajsekhar05/file-processor-api:latest
+    ports:
+      - "8000:8000"
+    restart: always
+  
+  worker:
+    image: rajsekhar05/file-processor-worker:latest
+    ports:
+      - "8001:8001"
+    restart: always

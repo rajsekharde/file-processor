@@ -10,7 +10,7 @@ import (
 func main() {
 	mux := http.NewServeMux()
 
-	root := http.FileServer(http.Dir("../frontend"))
+	root := http.FileServer(http.Dir("/frontend"))
 	task := http.HandlerFunc(HandleGetTask)
 	postTask := http.HandlerFunc(HandlePostTask)
 	uploadFile := http.HandlerFunc(HandleUpload)
