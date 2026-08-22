@@ -41,12 +41,31 @@ func main() {
 		})
 		log.Printf("Processing Task: %s\n", taskID)
 
-		// simulating background processing
-		time.Sleep(3 * time.Second)
+		// get task metadata
+		metadata, err := rdb.HGetAll(ctx, hashKey).Result()
+		if err != nil {
+			rdb.HSet(ctx, hashKey, map[string]interface{}{
+				"status": "failed",
+			})
+			log.Printf("Failed to fetch metadata for Task: %s\n\n", taskID)
+			continue
+		}
+
+		// call image format conversion function
+		fileName := metadata["file_name"]
+		outputFormat := metadata["output_format"]
+		res, message := ConvertFormat(fileName, outputFormat)
+		if res != 0 {
+			rdb.HSet(ctx, hashKey, map[string]interface{}{
+				"status": "failed",
+			})
+			log.Printf("Error: %s\n\n", message)
+			continue
+		}
 
 		rdb.HSet(ctx, hashKey, map[string]interface{}{
 			"status": "completed",
 		})
-		log.Printf("Completed Task: %s\n\n", taskID)
+		log.Printf("Task Completed\n\n")
 	}
 }
