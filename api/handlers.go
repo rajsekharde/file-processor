@@ -2,14 +2,16 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"encoding/json"
+	"time"
+
+	"github.com/google/uuid"
 	"github.com/rajsekharde/file-processor/shared"
-	// "github.com/google/uuid"
 )
 
 var WorkerURL = "http://worker:8001"
@@ -42,7 +44,8 @@ func HandleGetTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(responseData))
 }
 
-func HandlePostTask(w http.ResponseWriter, r *http.Request) {
+// Old POST /task handler sending direct HTTP requests to worker
+func HandlePostTaskTest(w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println(err.Error())
@@ -76,6 +79,36 @@ func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 
 	// Copy json response
 	w.Write(respData)
+}
+
+// New POST /task handler using Redis as Task Queue
+func handlePostTask(w http.ResponseWriter, r *http.Request) {
+	var task shared.TaskRequest
+	json.NewDecoder(r.Body).Decode(&task)
+
+	taskID := uuid.New().String()
+	taskData := map[string]interface{}{
+		"id": taskID,
+		"file_name": task.FileName,
+		"output_format": task.OutputFormat,
+		"status": "queued",
+		"created_at": time.Now(),
+	}
+	hashKey := "task:" + taskID
+
+	// Create hash using hash key and details
+	rdb.HSet(ctx, hashKey, taskData)
+
+	// Push the task id to list
+	rdb.LPush(ctx, "tasks", taskID)
+
+	log.Printf("Job ID: %s: Hash created and pushed to queue\n", taskID)
+
+	body := fmt.Sprintf(`{"task_status": "queued", "task_id": %s}`, taskID)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(body))
 }
 
 func HandleUpload(w http.ResponseWriter, r *http.Request) {

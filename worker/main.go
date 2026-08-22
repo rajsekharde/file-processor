@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -33,24 +33,27 @@ func main() {
 	// log.Printf("Worker Server running on port 8001...\n\n")
 	// http.ListenAndServe(":8001", mux)
 
+	if err := rdb.Ping(ctx).Err(); err != nil {
+        log.Fatalf("Failed to connect to Redis: %v", err)
+    }
+    log.Printf("Successfully connected to Redis\n")
+
 	log.Printf("Worker started. Waiting for jobs...\n")
 	for {
-		result, err := rdb.BRPop(ctx, 0*time.Second, "email_jobs").Result()
+		result, err := rdb.BRPop(ctx, 0*time.Second, "tasks").Result()
 		if err != nil {
 			log.Printf("Error popping job: %v", err)
 			time.Sleep(1 * time.Second) // Prevents hard loop on connection errors
 			continue
 		}
 
-		// Extract raw JSON job
-		rawJob := result[1]
+		taskID := result[1]
+		hashKey := "task:" + taskID
 
-		var job shared.Task
-		if err := json.Unmarshal([]byte(rawJob), &job); err != nil {
-			log.Printf("Invalid job format: %v", err)
-			continue
-		}
+		rdb.HSet(ctx, hashKey, map[string]interface{}{
+			"status":     string("processing"),
+		})
 
-		fmt.Printf("[WORKER] Accepted job: %v\n", job)
+		fmt.Printf("[WORKER] Task Accepted. ID: %v\n", taskID)
 	}
 }

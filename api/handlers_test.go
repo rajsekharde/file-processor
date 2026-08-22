@@ -107,7 +107,7 @@ func TestHandlePostTask(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/task", bytes.NewBuffer(jsonBody))
 	rec := httptest.NewRecorder()
 
-	HandlePostTask(rec, req)
+	HandlePostTaskTest(rec, req)
 
 	res := rec.Result()
 	defer res.Body.Close()
