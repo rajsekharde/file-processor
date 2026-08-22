@@ -1,0 +1,4 @@
+*.md
+file-storage/
+.git
+.gitignore
