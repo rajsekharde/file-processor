@@ -84,7 +84,10 @@ func HandlePostTaskTest(w http.ResponseWriter, r *http.Request) {
 // New POST /task handler using Redis as Task Queue
 func handlePostTask(w http.ResponseWriter, r *http.Request) {
 	var task shared.TaskRequest
-	json.NewDecoder(r.Body).Decode(&task)
+	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
+        http.Error(w, "Invalid request body", http.StatusBadRequest)
+        return
+    }
 
 	taskID := uuid.New().String()
 	taskData := map[string]interface{}{
@@ -104,27 +107,46 @@ func handlePostTask(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Job ID: %s: Hash created and pushed to queue\n", taskID)
 
-	body := fmt.Sprintf(`{"task_status": "queued", "task_id": %q}`, taskID)
+	response := map[string]string {
+		"task_id": taskID,
+		"status": "queued",
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(body))
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(response)
 }
 
 // Get task status
 func HandleGetStatus(w http.ResponseWriter, r *http.Request) {
-	taskID := r.URL.Query().Get("task_id")
+	taskID := r.PathValue("task_id")
+	if taskID == "" {
+		http.Error(w, "Task ID is required", http.StatusBadRequest)
+		return
+	}
 
 	hashKey := "task:" + taskID
 
 	// returns map[string]string of {field-name:value} pairs
-	metadata, _ := rdb.HGetAll(ctx, hashKey).Result()
+	metadata, err := rdb.HGetAll(ctx, hashKey).Result()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 
-	body := fmt.Sprintf(`{"status": %q}`, metadata["status"])
+	if len(metadata) == 0 {
+		http.Error(w, "Task not found", http.StatusNotFound)
+		return
+	}
+
+	response := map[string]string{
+		"task_id": taskID,
+		"status":  metadata["status"],
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(body))
+	json.NewEncoder(w).Encode(response)
 }
 
 func HandleUpload(w http.ResponseWriter, r *http.Request) {

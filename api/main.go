@@ -44,7 +44,7 @@ func main() {
 	mux.Handle("GET /task", shared.LoggerMiddleware(task))
 	mux.Handle("POST /task-test", shared.LoggerMiddleware(postTaskTest))
 	mux.Handle("POST /task", shared.LoggerMiddleware(postTask))
-	mux.Handle("GET /status", shared.LoggerMiddleware(getStatus))
+	mux.Handle("GET /status/{task_id}", shared.LoggerMiddleware(getStatus))
 	mux.Handle("POST /upload", shared.LoggerMiddleware(uploadFile))
 	mux.Handle("GET /download/{filename}", shared.LoggerMiddleware(downloadFile))
 	mux.Handle("POST /enqueue", shared.LoggerMiddleware(enqueue))
