@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"encoding/json"
+	"github.com/rajsekharde/file-processor/shared"
+	// "github.com/google/uuid"
 )
 
 var WorkerURL = "http://worker:8001"
@@ -122,4 +125,21 @@ func HandleDownload(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", info.Name()))
 
 	http.ServeFile(w, r, filePath)
+}
+
+// Redis test func
+func HandleEnqueue(w http.ResponseWriter, r *http.Request) {
+	var task shared.Task
+	json.NewDecoder(r.Body).Decode(&task)
+
+	// convert task struct to JSON
+	bytes, _ := json.Marshal(task)
+	jobJSON := string(bytes)
+
+	// push task to redis
+	err := rdb.LPush(ctx, "email_jobs", jobJSON).Err()
+	if err != nil {
+		http.Error(w, "Failed to enqueue job", http.StatusInternalServerError)
+		return
+	}
 }

@@ -1,11 +1,23 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/rajsekharde/file-processor/shared"
+	"github.com/redis/go-redis/v9"
 )
+
+var ctx = context.Background()
+var rdb = redis.NewClient(&redis.Options{
+	Addr: "localhost:6379",
+	Password: "",
+	DB: 0,
+})
 
 func main() {
 	mux := http.NewServeMux()
@@ -18,6 +30,27 @@ func main() {
 	mux.Handle("GET /task", shared.LoggerMiddleware(getTask))
 	mux.Handle("POST /task", shared.LoggerMiddleware(postTask))
 
-	log.Printf("Worker Server running on port 8001...\n\n")
-	http.ListenAndServe(":8001", mux)
+	// log.Printf("Worker Server running on port 8001...\n\n")
+	// http.ListenAndServe(":8001", mux)
+
+	log.Printf("Worker started. Waiting for jobs...\n")
+	for {
+		result, err := rdb.BRPop(ctx, 0*time.Second, "email_jobs").Result()
+		if err != nil {
+			log.Printf("Error popping job: %v", err)
+			time.Sleep(1 * time.Second) // Prevents hard loop on connection errors
+			continue
+		}
+
+		// Extract raw JSON job
+		rawJob := result[1]
+
+		var job shared.Task
+		if err := json.Unmarshal([]byte(rawJob), &job); err != nil {
+			log.Printf("Invalid job format: %v", err)
+			continue
+		}
+
+		fmt.Printf("[WORKER] Accepted job: %v\n", job)
+	}
 }
