@@ -58,6 +58,7 @@ func main() {
 		if res != 0 {
 			rdb.HSet(ctx, hashKey, map[string]interface{}{
 				"status": "failed",
+				"error": message,
 			})
 			log.Printf("Error: %s\n\n", message)
 			continue
@@ -65,6 +66,7 @@ func main() {
 
 		rdb.HSet(ctx, hashKey, map[string]interface{}{
 			"status": "completed",
+			"output_file": message,
 		})
 		log.Printf("Task Completed\n\n")
 	}

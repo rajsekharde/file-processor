@@ -84,6 +84,13 @@ func HandleGetTask(w http.ResponseWriter, r *http.Request) {
 		"created_at": metadata["created_at"],
 	}
 
+	if(metadata["status"] == "completed") {
+		response["output_file"] = metadata["output_file"]
+	}
+	if(metadata["status"] == "failed") {
+		response["error"] = metadata["error"]
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
