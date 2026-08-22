@@ -4,6 +4,8 @@ services:
     ports:
       - "8000:8000"
     restart: always
+    environment:
+      - FRONTEND_PATH=/frontend
     volumes:
       - ./file-storage:/file-storage
     networks:

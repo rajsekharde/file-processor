@@ -104,7 +104,7 @@ func handlePostTask(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Job ID: %s: Hash created and pushed to queue\n", taskID)
 
-	body := fmt.Sprintf(`{"task_status": "queued", "task_id": %s}`, taskID)
+	body := fmt.Sprintf(`{"task_status": "queued", "task_id": %q}`, taskID)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -120,7 +120,7 @@ func HandleGetStatus(w http.ResponseWriter, r *http.Request) {
 	// returns map[string]string of {field-name:value} pairs
 	metadata, _ := rdb.HGetAll(ctx, hashKey).Result()
 
-	body := fmt.Sprintf(`{"status": "%s"}`, metadata["status"])
+	body := fmt.Sprintf(`{"status": %q}`, metadata["status"])
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

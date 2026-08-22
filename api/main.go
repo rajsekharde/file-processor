@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
-	"context"
-	"github.com/redis/go-redis/v9"
+	"os"
+
 	"github.com/rajsekharde/file-processor/shared"
+	"github.com/redis/go-redis/v9"
 )
 
 var ctx = context.Background()
@@ -22,9 +24,14 @@ func main() {
     }
     log.Println("Successfully connected to Redis")
 
+	frontendPath := os.Getenv("FRONTEND_PATH")
+	if frontendPath == "" {
+		frontendPath = "../frontend"
+	}
+
 	mux := http.NewServeMux()
 
-	root := http.FileServer(http.Dir("/frontend"))
+	root := http.FileServer(http.Dir("../frontend"))
 	task := http.HandlerFunc(HandleGetTask)
 	postTaskTest := http.HandlerFunc(HandlePostTaskTest)
 	postTask := http.HandlerFunc(handlePostTask)
