@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,68 +20,8 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "API Server Running")
 }
 
-func HandleGetTask(w http.ResponseWriter, r *http.Request) {
-
-	// Get task status from worker via an HTTP request
-	resp, err := http.Get(WorkerURL + "/task")
-
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Could not fetch API", http.StatusBadGateway)
-		return
-	}
-	defer resp.Body.Close()
-
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Could not read data", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, string(responseData))
-}
-
-// Old POST /task handler sending direct HTTP requests to worker
-func HandlePostTaskTest(w http.ResponseWriter, r *http.Request) {
-	bodyBytes, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Empty or invalid body", http.StatusBadRequest)
-		return
-	}
-
-	// Send task to worker via an HTTP request
-	url := WorkerURL + "/task"
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(bodyBytes))
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Failed to send task to worker", http.StatusBadGateway)
-		return
-	}
-	defer resp.Body.Close()
-
-	respData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Failed to read request", http.StatusInternalServerError)
-		return
-	}
-	log.Println("Worker:", string(respData))
-
-	// Set header for json payload
-	w.Header().Set("Content-Type", "application/json")
-
-	// Copy status code
-	w.WriteHeader(resp.StatusCode)
-
-	// Copy json response
-	w.Write(respData)
-}
-
 // New POST /task handler using Redis as Task Queue
-func handlePostTask(w http.ResponseWriter, r *http.Request) {
+func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 	var task shared.TaskRequest
 	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
         http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -117,8 +56,8 @@ func handlePostTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// Get task status
-func HandleGetStatus(w http.ResponseWriter, r *http.Request) {
+// Get task details
+func HandleGetTask(w http.ResponseWriter, r *http.Request) {
 	taskID := r.PathValue("task_id")
 	if taskID == "" {
 		http.Error(w, "Task ID is required", http.StatusBadRequest)
@@ -142,6 +81,7 @@ func HandleGetStatus(w http.ResponseWriter, r *http.Request) {
 	response := map[string]string{
 		"task_id": taskID,
 		"status":  metadata["status"],
+		"created_at": metadata["created_at"],
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -196,21 +136,4 @@ func HandleDownload(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", info.Name()))
 
 	http.ServeFile(w, r, filePath)
-}
-
-// Redis test func
-func HandleEnqueue(w http.ResponseWriter, r *http.Request) {
-	var task shared.Task
-	json.NewDecoder(r.Body).Decode(&task)
-
-	// convert task struct to JSON
-	bytes, _ := json.Marshal(task)
-	jobJSON := string(bytes)
-
-	// push task to redis
-	err := rdb.LPush(ctx, "email_jobs", jobJSON).Err()
-	if err != nil {
-		http.Error(w, "Failed to enqueue job", http.StatusInternalServerError)
-		return
-	}
 }

@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
-	// "encoding/json"
-	"fmt"
+	// "fmt"
 	"log"
-	"net/http"
 	"time"
 
-	"github.com/rajsekharde/file-processor/shared"
+	// "github.com/rajsekharde/file-processor/shared"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -20,25 +18,13 @@ var rdb = redis.NewClient(&redis.Options{
 })
 
 func main() {
-	mux := http.NewServeMux()
-
-	root := http.HandlerFunc(handleRoot)
-	getTask := http.HandlerFunc(handleTask)
-	postTask := http.HandlerFunc(handlePostTask)
-	
-	mux.Handle("GET /", shared.LoggerMiddleware(root))
-	mux.Handle("GET /task", shared.LoggerMiddleware(getTask))
-	mux.Handle("POST /task", shared.LoggerMiddleware(postTask))
-
-	// log.Printf("Worker Server running on port 8001...\n\n")
-	// http.ListenAndServe(":8001", mux)
-
+	// Ping redis server to check if it's active
 	if err := rdb.Ping(ctx).Err(); err != nil {
         log.Fatalf("Failed to connect to Redis: %v", err)
     }
     log.Printf("Successfully connected to Redis\n")
 
-	log.Printf("Worker started. Waiting for jobs...\n")
+	log.Printf("Worker started. Waiting for jobs...\n\n")
 	for {
 		result, err := rdb.BRPop(ctx, 0*time.Second, "tasks").Result()
 		if err != nil {
@@ -51,9 +37,16 @@ func main() {
 		hashKey := "task:" + taskID
 
 		rdb.HSet(ctx, hashKey, map[string]interface{}{
-			"status":     string("processing"),
+			"status": "processing",
 		})
+		log.Printf("Processing Task: %s\n", taskID)
 
-		fmt.Printf("[WORKER] Task Accepted. ID: %v\n", taskID)
+		// simulating background processing
+		time.Sleep(3 * time.Second)
+
+		rdb.HSet(ctx, hashKey, map[string]interface{}{
+			"status": "completed",
+		})
+		log.Printf("Completed Task: %s\n\n", taskID)
 	}
 }

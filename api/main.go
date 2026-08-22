@@ -31,23 +31,17 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	root := http.FileServer(http.Dir("../frontend"))
-	task := http.HandlerFunc(HandleGetTask)
-	postTaskTest := http.HandlerFunc(HandlePostTaskTest)
-	postTask := http.HandlerFunc(handlePostTask)
-	getStatus := http.HandlerFunc(HandleGetStatus)
+	root := http.FileServer(http.Dir(frontendPath))
+	postTask := http.HandlerFunc(HandlePostTask)
+	getTask := http.HandlerFunc(HandleGetTask)
 	uploadFile := http.HandlerFunc(HandleUpload)
 	downloadFile := http.HandlerFunc(HandleDownload)
-	enqueue := http.HandlerFunc(HandleEnqueue)
 
 	mux.Handle("GET /", shared.LoggerMiddleware(root))
-	mux.Handle("GET /task", shared.LoggerMiddleware(task))
-	mux.Handle("POST /task-test", shared.LoggerMiddleware(postTaskTest))
 	mux.Handle("POST /task", shared.LoggerMiddleware(postTask))
-	mux.Handle("GET /status/{task_id}", shared.LoggerMiddleware(getStatus))
+	mux.Handle("GET /task/{task_id}", shared.LoggerMiddleware(getTask))
 	mux.Handle("POST /upload", shared.LoggerMiddleware(uploadFile))
 	mux.Handle("GET /download/{filename}", shared.LoggerMiddleware(downloadFile))
-	mux.Handle("POST /enqueue", shared.LoggerMiddleware(enqueue))
 
 	log.Printf("API Server running on port 8000...\n\n")
 	http.ListenAndServe(":8000", mux)
