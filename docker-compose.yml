@@ -18,6 +18,14 @@ services:
       - ./file-storage:/file-storage
     networks:
       - app-network
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - app-network
 
 networks:
   app-network:
