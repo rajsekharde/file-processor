@@ -111,6 +111,22 @@ func handlePostTask(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(body))
 }
 
+// Get task status
+func HandleGetStatus(w http.ResponseWriter, r *http.Request) {
+	taskID := r.URL.Query().Get("task_id")
+
+	hashKey := "task:" + taskID
+
+	// returns map[string]string of {field-name:value} pairs
+	metadata, _ := rdb.HGetAll(ctx, hashKey).Result()
+
+	body := fmt.Sprintf(`{"status": "%s"}`, metadata["status"])
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(body))
+}
+
 func HandleUpload(w http.ResponseWriter, r *http.Request) {
 	file, handler, err := r.FormFile("newFile")
 	if err != nil {
