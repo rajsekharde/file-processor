@@ -16,6 +16,11 @@ var rdb = redis.NewClient(&redis.Options{
 })
 
 func main() {
+	if err := rdb.Ping(ctx).Err(); err != nil {
+        log.Fatalf("Failed to connect to Redis: %v", err)
+    }
+    log.Println("Successfully connected to Redis")
+
 	mux := http.NewServeMux()
 
 	root := http.FileServer(http.Dir("/frontend"))
