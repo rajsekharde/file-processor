@@ -6,7 +6,8 @@ import (
 	"log"
 	"time"
 	"os"
-	// "github.com/rajsekharde/file-processor/shared"
+	"encoding/json"
+	"github.com/rajsekharde/file-processor/shared"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -32,6 +33,8 @@ func main() {
     log.Printf("Successfully connected to Redis\n")
 
 	log.Printf("Worker started. Waiting for jobs...\n\n")
+
+
 	for {
 		result, err := rdb.BRPop(ctx, 0*time.Second, "tasks").Result()
 		if err != nil {
@@ -57,11 +60,26 @@ func main() {
 			log.Printf("Failed to fetch metadata for Task: %s\n\n", taskID)
 			continue
 		}
+		taskType := metadata["type"]
 
-		// call image format conversion function
-		fileName := metadata["file_name"]
-		outputFormat := metadata["output_format"]
-		res, message := ConvertFormat(taskID, fileName, outputFormat)
+		var res int
+		var message string
+
+		switch taskType {
+		case "convert_format":
+			var payload shared.ConvertFormatPayload
+			if err := json.Unmarshal([] byte(metadata["payload"]), &payload); err != nil {
+				res, message = 1, "Invalid payload for convert_format"
+				break
+			}
+			fileName := payload.FileName
+			outputFormat := payload.OutputFormat
+			res, message = ConvertFormat(taskID, fileName, outputFormat)
+		default:
+			res = 1
+			message = "Invalid task type"
+		}
+		
 		if res != 0 {
 			rdb.HSet(ctx, hashKey, map[string]interface{}{
 				"status": "failed",

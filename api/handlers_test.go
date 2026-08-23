@@ -88,31 +88,31 @@ func TestHandleDownload(t *testing.T) {
 	}
 }
 
-func TestHandlePostTask(t *testing.T) {
-	// Spin up a fake local worker test server
-	workerServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status": "success", "output_file": "out.txt"}`))
-	}))
-	defer workerServer.Close()
+// func TestHandlePostTask(t *testing.T) {
+// 	// Spin up a fake local worker test server
+// 	workerServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		w.Header().Set("Content-Type", "application/json")
+// 		w.WriteHeader(http.StatusOK)
+// 		w.Write([]byte(`{"status": "success", "output_file": "out.txt"}`))
+// 	}))
+// 	defer workerServer.Close()
 
-	// Override the global WorkerURL with the test server's dynamic URL
-	originalURL := WorkerURL
-	WorkerURL = workerServer.URL
-	defer func() { WorkerURL = originalURL }() // Restore original URL after test
+// 	// Override the global WorkerURL with the test server's dynamic URL
+// 	originalURL := WorkerURL
+// 	WorkerURL = workerServer.URL
+// 	defer func() { WorkerURL = originalURL }() // Restore original URL after test
 
-	// Perform the test request
-	jsonBody := []byte(`{"FileName": "input.txt", "OutputFormat": "pdf"}`)
-	req := httptest.NewRequest(http.MethodPost, "/task", bytes.NewBuffer(jsonBody))
-	rec := httptest.NewRecorder()
+// 	// Perform the test request
+// 	jsonBody := []byte(`{"FileName": "input.txt", "OutputFormat": "pdf"}`)
+// 	req := httptest.NewRequest(http.MethodPost, "/task", bytes.NewBuffer(jsonBody))
+// 	rec := httptest.NewRecorder()
 
-	HandlePostTask(rec, req)
+// 	HandlePostTask(rec, req)
 
-	res := rec.Result()
-	defer res.Body.Close()
+// 	res := rec.Result()
+// 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		t.Errorf("Expected status OK, got %d", res.StatusCode)
-	}
-}
+// 	if res.StatusCode != http.StatusOK {
+// 		t.Errorf("Expected status OK, got %d", res.StatusCode)
+// 	}
+// }

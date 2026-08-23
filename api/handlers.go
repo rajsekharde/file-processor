@@ -26,21 +26,32 @@ func HandlePostTask(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+	if task.Type == "" {
+        http.Error(w, "Task type is required", http.StatusBadRequest)
+        return
+    }
+
 	taskID := uuid.New().String()
 	taskData := map[string]interface{}{
 		"id": taskID,
-		"file_name": task.FileName,
-		"output_format": task.OutputFormat,
+		"type": task.Type,
+		"payload": string(task.Payload),
 		"status": "queued",
-		"created_at": time.Now(),
+		"created_at": time.Now().Format(time.RFC3339),
 	}
 	hashKey := "task:" + taskID
 
-	// Create hash using hash key and details
-	rdb.HSet(ctx, hashKey, taskData)
+	// Create hash
+    if err := rdb.HSet(ctx, hashKey, taskData).Err(); err != nil {
+        http.Error(w, "Failed to save task metadata", http.StatusInternalServerError)
+        return
+    }
 
-	// Push the task id to list
-	rdb.LPush(ctx, "tasks", taskID)
+    // Push to queue
+    if err := rdb.LPush(ctx, "tasks", taskID).Err(); err != nil {
+        http.Error(w, "Failed to enqueue task", http.StatusInternalServerError)
+        return
+    }
 
 	log.Printf("Job ID: %s: Hash created and pushed to queue\n", taskID)
 
