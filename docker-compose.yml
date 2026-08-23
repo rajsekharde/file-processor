@@ -5,9 +5,8 @@ services:
     ports:
       - "8000:8000"
     restart: always
-    environment:
-      - FRONTEND_PATH=/frontend
-      - REDIS_HOST=redis:6379
+    env_file:
+      - .env
     volumes:
       - ./file-storage:/file-storage
     networks:
@@ -20,8 +19,8 @@ services:
     container_name: file-processor-worker
     image: rajsekhar05/file-processor-worker:latest
     restart: always
-    environment:
-      - REDIS_HOST=redis:6379
+    env_file:
+      - .env
     volumes:
       - ./file-storage:/file-storage
     networks:
