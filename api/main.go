@@ -11,13 +11,20 @@ import (
 )
 
 var ctx = context.Background()
-var rdb = redis.NewClient(&redis.Options{
-	Addr: "localhost:6379",
-	Password: "",
-	DB: 0,
-})
+var rdb *redis.Client
 
 func main() {
+	var redisAddr = os.Getenv("REDIS_HOST")
+	if redisAddr == "" {
+		redisAddr = "localhost:6379"
+	}
+
+	rdb = redis.NewClient(&redis.Options{
+		Addr: redisAddr,
+		Password: "",
+		DB: 0,
+	})
+	
 	// Ping the redis server to check if it's active
 	if err := rdb.Ping(ctx).Err(); err != nil {
         log.Fatalf("Failed to connect to Redis: %v", err)
