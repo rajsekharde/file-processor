@@ -13,8 +13,6 @@ import (
 	"github.com/rajsekharde/file-processor/shared"
 )
 
-var WorkerURL = "http://worker:8001"
-
 func HandleRoot(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "API Server Running")

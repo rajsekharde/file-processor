@@ -19,8 +19,6 @@ services:
   worker:
     container_name: file-processor-worker
     image: rajsekhar05/file-processor-worker:latest
-    ports:
-      - "8001:8001"
     restart: always
     environment:
       - REDIS_HOST=redis:6379
@@ -35,8 +33,6 @@ services:
   redis:
     container_name: file-processor-redis
     image: redis:alpine
-    ports:
-      - "6379:6379"
     restart: always
     networks:
       - app-network

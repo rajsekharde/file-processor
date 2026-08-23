@@ -61,7 +61,7 @@ func main() {
 		// call image format conversion function
 		fileName := metadata["file_name"]
 		outputFormat := metadata["output_format"]
-		res, message := ConvertFormat(fileName, outputFormat)
+		res, message := ConvertFormat(taskID, fileName, outputFormat)
 		if res != 0 {
 			rdb.HSet(ctx, hashKey, map[string]interface{}{
 				"status": "failed",

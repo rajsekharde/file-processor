@@ -8,13 +8,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
-func ConvertFormat(inputFileName string, outputFormat string) (int, string) {
-	currentTime := time.Now()
-	dateString := currentTime.Format("2006-01-02")
-	outputFileName := "output-" + dateString + "." + outputFormat
+func ConvertFormat(taskID string, inputFileName string, outputFormat string) (int, string) {
+	outputFileName := "output-" + taskID + "." + outputFormat
 	outputPath := "../file-storage/completed/" + outputFileName
 	inputPath := "../file-storage/uploads/" + inputFileName
 
