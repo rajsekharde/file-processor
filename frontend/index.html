@@ -1,20 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Processor</title>
+    <title>File Processor Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text: #1f2937;
+            --border: #e5e7eb;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        h1,
+        h2 {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        select,
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .dynamic-section {
+            display: none;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border: 1px dashed var(--border);
+            margin-bottom: 16px;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-queued {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Image / PDF Processor</h1>
-    <input type="file" id="fileInput" />
-    <button id="fileUploadButton" onclick="uploadFile()">Upload</button>
-    <button id="postTaskButton" onclick="postTask()">Post</button>
-    <br>
-    <p id="outputFileName"></p>
-    <button id="fileDownloadButton" onclick="downloadFile()">Download</button>
-    <button id="clearButton" onclick="clearFields()">Clear</button>
+
+    <h1>File Processor</h1>
+
+    <div class="card">
+        <h2>1. Create Task</h2>
+
+        <div class="form-group">
+            <label for="operationType">Select Operation</label>
+            <select id="operationType" onchange="renderOperationUI()">
+                <option value="">-- Choose Operation --</option>
+                <option value="compress">File Compression</option>
+                <option value="add_watermark">Add Watermark</option>
+                <option value="convert_format">Convert Format</option>
+            </select>
+        </div>
+
+        <div id="opts-compress" class="dynamic-section">
+            <div class="form-group">
+                <label for="file-compress">Select File to Compress</label>
+                <input type="file" id="file-compress">
+            </div>
+            <div class="form-group">
+                <label for="ratio">Compression Level (1-9)</label>
+                <input type="text" id="ratio" placeholder="e.g. 6">
+            </div>
+        </div>
+
+        <div id="opts-add_watermark" class="dynamic-section">
+            <div class="form-group">
+                <label for="file-watermark">Select Image/PDF</label>
+                <input type="file" id="file-watermark">
+            </div>
+            <div class="form-group">
+                <label for="watermarkText">Watermark Text</label>
+                <input type="text" id="watermarkText" placeholder="e.g. CONFIDENTIAL">
+            </div>
+        </div>
+
+        <div id="opts-convert_format" class="dynamic-section">
+            <div class="form-group">
+                <label for="file-convert">Select Source File</label>
+                <input type="file" id="file-convert">
+            </div>
+            <div class="form-group">
+                <label for="targetFormat">Target Format</label>
+                <input type="text" id="targetFormat" placeholder="e.g. pdf, png, txt">
+            </div>
+        </div>
+
+        <button id="submitBtn" onclick="submitTask()" disabled>Submit Task</button>
+    </div>
+
+    <div class="card">
+        <h2>2. Track & Download</h2>
+        <div class="form-group">
+            <label for="trackTaskId">Task ID</label>
+            <input type="text" id="trackTaskId" placeholder="Enter UUID">
+        </div>
+        <button onclick="checkStatus()">Check Status</button>
+
+        <div id="statusResult" class="hidden" style="margin-top: 16px;">
+            <p><strong>Status:</strong> <span id="statusBadge" class="status-badge"></span></p>
+            <p id="timeContainer"><strong>Created At:</strong> <span id="createdAt"></span></p>
+            <p id="errorContainer" class="hidden" style="color: red;"><strong>Error:</strong> <span
+                    id="errorMsg"></span></p>
+
+            <button id="downloadBtn" class="hidden" onclick="downloadFile()">Download Output File</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
+
 </html>
