@@ -65,16 +65,22 @@ func main() {
 		var res int
 		var message string
 
+		// call function based on operation type
 		switch taskType {
+		// resize image
+		case "resize_image":
+			res, message = 1, "Could not perform operation"
+		// convert image format
 		case "convert_format":
 			var payload shared.ConvertFormatPayload
 			if err := json.Unmarshal([] byte(metadata["payload"]), &payload); err != nil {
-				res, message = 1, "Invalid payload for convert_format"
+				res, message = 1, "Invalid payload for format conversion"
 				break
 			}
 			fileName := payload.FileName
 			outputFormat := payload.OutputFormat
 			res, message = ConvertFormat(taskID, fileName, outputFormat)
+		// default response & message
 		default:
 			res = 1
 			message = "Invalid task type"
