@@ -20,7 +20,7 @@
             <select id="operationType" onchange="renderOperationUI()">
                 <option value="">-- Choose Operation --</option>
                 <option value="compress">File Compression</option>
-                <option value="add_watermark">Add Watermark</option>
+                <option value="resize_image">Resize Image</option>
                 <option value="convert_format">Convert Format</option>
             </select>
         </div>
@@ -36,14 +36,18 @@
             </div>
         </div>
 
-        <div id="opts-add_watermark" class="dynamic-section">
+        <div id="opts-resize_image" class="dynamic-section">
             <div class="form-group">
-                <label for="file-watermark">Select Image/PDF</label>
-                <input type="file" id="file-watermark">
+                <label for="file-resize">Select Image</label>
+                <input type="file" id="file-resize">
             </div>
             <div class="form-group">
-                <label for="watermarkText">Watermark Text</label>
-                <input type="text" id="watermarkText" placeholder="e.g. CONFIDENTIAL">
+                <label for="targetWidth">Target Width (px)</label>
+                <input type="number" id="targetWidth" placeholder="e.g. 800">
+            </div>
+            <div class="form-group">
+                <label for="targetHeight">Target Height (px)</label>
+                <input type="number" id="targetHeight" placeholder="e.g. 600">
             </div>
         </div>
 

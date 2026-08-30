@@ -22,19 +22,18 @@ async function submitTask() {
     const type = document.getElementById("operationType").value;
     let payloadData = {};
 
-    let CFPayload = {};
     let fileInput = null;
 
     if (type === "compress") {
         fileInput = document.getElementById("file-compress");
         payloadData.level = document.getElementById("ratio").value;
-    } else if (type === "watermark") {
-        fileInput = document.getElementById("file-watermark");
-        payloadData.text = document.getElementById("watermarkText").value;
+    } else if (type === "resize_image") {
+        fileInput = document.getElementById("file-resize");
+        payloadData.target_width = parseInt(document.getElementById("targetWidth").value)
+        payloadData.target_height = parseInt(document.getElementById("targetHeight").value)
     } else if (type === "convert_format") {
         fileInput = document.getElementById("file-convert");
         payloadData.target_format = document.getElementById("targetFormat").value;
-        CFPayload.output_format = document.getElementById("targetFormat").value;
     }
 
     // Step 1: Upload file if selected
@@ -49,8 +48,7 @@ async function submitTask() {
                 body: formData
             });
             if (!uploadRes.ok) throw new Error("File upload failed");
-            payloadData.filename = file.name;
-            CFPayload.file_name = file.name;
+            payloadData.file_name = file.name;
         } catch (err) {
             alert("Error uploading file: " + err.message);
             return;
@@ -64,7 +62,7 @@ async function submitTask() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 type: type,
-                payload: CFPayload
+                payload: payloadData
             })
         });
 
