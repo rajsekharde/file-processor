@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/google/uuid"
@@ -115,7 +116,8 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	// create new local file at "../file-storage/uploads/" with same name
-	dst, err := os.Create("../file-storage/uploads/" +  handler.Filename)
+	fileName := filepath.Base(handler.Filename)
+	dst, err := os.Create("../file-storage/uploads/" +  fileName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -131,6 +133,7 @@ func HandleUpload(w http.ResponseWriter, r *http.Request) {
 
 func HandleDownload(w http.ResponseWriter, r *http.Request) {
 	fileName := r.PathValue("filename")
+	fileName = filepath.Base(fileName)
 
 	if fileName == "" {
 		http.Error(w, "Missing filename in path", http.StatusBadRequest)
