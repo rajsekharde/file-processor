@@ -14,11 +14,6 @@ import (
 	"github.com/rajsekharde/file-processor/shared"
 )
 
-func HandleRoot(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "API Server Running")
-}
-
 // New POST /task handler using Redis as Task Queue
 func HandlePostTask(w http.ResponseWriter, r *http.Request) {
 	var task shared.TaskRequest

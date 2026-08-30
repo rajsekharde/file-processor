@@ -43,37 +43,43 @@ Worker Node:
 
 ## Build & Run using Docker & Docker Compose
 
-Move to root project directory
+Requirements: Git, Docker, Docker-Compose, Go 1.25+
 
-Build the api and worker images:
+1. Clone the repository
 ```bash
-docker build -f api/Dockerfile -t rajsekhar05/file-processor-api:latest .
-
-docker build -f worker/Dockerfile -t rajsekhar05/file-processor-worker:latest .
+git clone https://github.com/rajsekharde/file-processor.git
+cd file-processor
 ```
 
-Push the images to Docker Hub:
+2. Build the api and worker images:
 ```bash
-docker push rajsekhar05/file-processor-api:latest
-
-docker push rajsekhar05/file-processor-worker:latest
+make build-all
 ```
 
-OR use script for building & pushing images:
+3. Run the application using Docker Compose:
 ```bash
-chmod +x scripts/*
-scripts/build-deploy.sh
+make run-app
 ```
 
-Pull images and run the containers using Docker Compose:
+Open localhost:8000 in a browser and perform file operations
+
+4. Stop the application and remove volumes/containers:
 ```bash
-docker compose up
+make stop-app
 ```
 
 
-## Running the application
+## Run the application without building binaries
 
 Clone the repository
+
+Run a standalone Redis container:
+```bash
+make run-redis
+
+# Stop the container
+make stop-redis
+```
 
 Run the API Server:
 ```bash
@@ -87,7 +93,7 @@ cd worker
 go run .
 ```
 
-Send requests to the api server
+Open localhost:8000 in a browser and perform file operations
 
 Test api server:
 ```bash
