@@ -16,7 +16,7 @@ import (
 Opens and decodes input file, resizes to given dimensions and saves as a PNG image.
 Returns (0, output filename) or (1, Error message) if operation fails.
 */
-func resizeImage(taskID string, inputFileName string, newWidth int, newHeight int) (int, string) {
+func resizeImage(taskID string, inputFileName string, targetWidth int, targetHeight int) (int, string) {
 	inputPath := "../file-storage/uploads/" + inputFileName
 	inputFile, err := os.Open(inputPath)
 	if err != nil {
@@ -33,7 +33,7 @@ func resizeImage(taskID string, inputFileName string, newWidth int, newHeight in
 	outputPath := "../file-storage/completed/" + outputFileName
 
 	// Create a new blank RGBA destination image
-	dst := image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+	dst := image.NewRGBA(image.Rect(0, 0, targetWidth, targetHeight))
 
 	// Scale using BiLinear interpolation (CatmullRom is also available for higher quality)
 	draw.BiLinear.Scale(dst, dst.Bounds(), img, img.Bounds(), draw.Over, nil)
@@ -56,7 +56,7 @@ func resizeImage(taskID string, inputFileName string, newWidth int, newHeight in
 Opens and converts input file to given format, and stores the output file.
 Returns (0, output filename) or (1, Error message) if operation fails.
 */
-func ConvertFormat(taskID string, inputFileName string, outputFormat string) (int, string) {
+func convertFormat(taskID string, inputFileName string, outputFormat string) (int, string) {
 	outputFileName := "output-" + taskID + "." + outputFormat
 	outputPath := "../file-storage/completed/" + outputFileName
 	inputPath := "../file-storage/uploads/" + inputFileName
