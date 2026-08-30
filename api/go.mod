@@ -2,15 +2,15 @@ module github.com/rajsekharde/file-processor/api
 
 go 1.25.6
 
-require github.com/rajsekharde/file-processor/shared v0.0.0
+require (
+	github.com/google/uuid v1.6.0
+	github.com/rajsekharde/file-processor/shared v0.0.0
+	github.com/redis/go-redis/v9 v9.22.0
+)
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
-	github.com/redis/go-redis/v9 v9.22.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/image v0.45.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 )
 

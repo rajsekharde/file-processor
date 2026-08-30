@@ -16,7 +16,7 @@ var rdb *redis.Client
 func main() {
 	var redisAddr = os.Getenv("REDIS_HOST")
 	if redisAddr == "" {
-		redisAddr = "localhost:6379"
+		redisAddr = "localhost:6380"
 	}
 
 	rdb = redis.NewClient(&redis.Options{
