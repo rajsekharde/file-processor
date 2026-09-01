@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/rajsekharde/file-processor/shared"
 	"github.com/redis/go-redis/v9"
@@ -50,6 +53,37 @@ func main() {
 	mux.Handle("POST /upload", shared.LoggerMiddleware(uploadFile))
 	mux.Handle("GET /download/{filename}", shared.LoggerMiddleware(downloadFile))
 
-	log.Printf("API Server running on port 8000...\n\n")
-	http.ListenAndServe(":8000", mux)
+	server := &http.Server{
+		Addr: ":8000",
+		Handler: mux,
+	}
+
+	go func() {
+		log.Printf("API Server running on port 8000...\n\n")
+		err := server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatal(err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Server shutting down...")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel()
+
+	err := server.Shutdown(shutdownCtx)
+	if err != nil {
+		log.Fatalf("Error while shutting down server: %v\n", err.Error())
+	}
+
+	if err := rdb.Close(); err != nil {
+		log.Printf("Error closing Redis connection: %v", err)
+	} else {
+		log.Println("Redis connection closed successfully.")
+	}
+
+	log.Println("Server exited cleanly.")
 }
