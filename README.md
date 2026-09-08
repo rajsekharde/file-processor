@@ -3,6 +3,8 @@
 
 ## Architecture
 
+![Architecture diagram](assets/file-processor-archtecture.jpg)
+
 API Node:
 - Stateless
 - Workflow:
